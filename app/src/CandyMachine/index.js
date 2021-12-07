@@ -308,8 +308,9 @@ return (
   // Only show this if machineStats is available
   machineStats && (
     <div className="machine-container">
-      <p>{`Drop Date: ${machineStats.goLiveDateTimeString}`}</p>
-      <p>{`Items Minted: ${machineStats.itemsRedeemed} / ${machineStats.itemsAvailable}`}</p>
+
+      <p>Drop Date: <br/></p><span className="drop-date">{machineStats.goLiveDateTimeString} </span>
+      <p>Items Minted:</p> <span className="items-minted">{machineStats.itemsRedeemed} / {machineStats.itemsAvailable} </span>
       <button className="cta-button mint-button" onClick={null}>
           Mint LFC NFT
       </button>

@@ -1,6 +1,6 @@
 .App {
   height: 100vh;
-  background-color: rgb(20, 20, 20);
+  background: -webkit-linear-gradient(left, #df0a0a, #356ce2);
   overflow: scroll;
   text-align: center;
   overflow: hidden;
@@ -65,10 +65,11 @@
 }
 
 .mint-button {
-  background: -webkit-linear-gradient(left, #4e44ce, #35aee2);
+  background: -webkit-linear-gradient(left, #ce4444, #35aee2);
   background-size: 200% 200%;
   animation: gradient-animation 4s ease infinite;
   margin-left: 10px;
+  border-radius: 40em;
 }
 
 .footer-container {
