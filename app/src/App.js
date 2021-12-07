@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import twitterLogo from './assets/twitter-logo.svg';
-
+import CandyMachine from './CandyMachine';
 // Constants
 const TWITTER_HANDLE = 'afzaan_';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
@@ -72,10 +72,10 @@ const App = () => {
     <div className="App">
       <div className="container">
         <div className="header-container">
-          <p className="header">🍭 Candy Drop</p>
-          <p className="sub-text">NFT drop machine with fair mint</p>
+          <p className="header">LFC DROP!</p>
+          <p className="sub-text">LFC NFT drop machine with fair mint</p>
           {/* showing button when wallet isnt connected*/}
-          {!walletAddress && renderNotConnectedContainer() || walletAddress && renderConnectedContainer()}
+          {!walletAddress && renderNotConnectedContainer()}  {walletAddress && <CandyMachine walletAddress={window.solana} />}
         </div>
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
