@@ -27,6 +27,8 @@ const MAX_CREATOR_LEN = 32 + 1 + 1;
 const CandyMachine = ({ walletAddress }) => {
 
   const [machineStats, setMachineStats] = useState(null);
+  // New state property
+const [mints, setMints] = useState([]);
   // Actions
   const fetchHashTable = async (hash, metadataEnabled) => {
     const connection = new web3.Connection(
@@ -298,11 +300,45 @@ const getCandyMachineState = async () => {
     goLiveData,
     goLiveDateTimeString,
   });
+
+  const data = await fetchHashTable(
+    process.env.REACT_APP_CANDY_MACHINE_ID,
+    true
+  );
+  
+  if (data.length !== 0) {
+    for (const mint of data) {
+      // Get URI
+      const response = await fetch(mint.data.uri);
+      const parse = await response.json();
+      const name = await fetch(mint)
+      console.log("this is name", name)
+      console.log("Past Minted NFT", mint)
+  
+      // Get image URI
+      if (!mints.find((mint) => mint === parse.image)) {
+        setMints((prevState) => [...prevState, parse.image]);
+      }
+    }
+  }
 };
 useEffect(() => {
   getCandyMachineState();
 },[]);
-
+const renderMintedItems = () => (
+  <div className="gif-container">
+    <p className="sub-text">Minted Items ✨</p>
+    <div className="gif-grid">
+      {mints.map((mint, i) => (
+        <div className="gif-item" key={i}>
+          
+          <img src={mint} alt={`Minted NFT ${mint}`} />
+          
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 return (
   // Only show this if machineStats is available
@@ -311,9 +347,10 @@ return (
 
       <p>Drop Date: <br/></p><span className="drop-date">{machineStats.goLiveDateTimeString} </span>
       <p>Items Minted:</p> <span className="items-minted">{machineStats.itemsRedeemed} / {machineStats.itemsAvailable} </span>
-      <button className="cta-button mint-button" onClick={null}>
+      <button className="cta-button mint-button" onClick={mintToken}>
           Mint LFC NFT
       </button>
+      {mints.length > 0 && renderMintedItems()}
     </div>
   )
 );
