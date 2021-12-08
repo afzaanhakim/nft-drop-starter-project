@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Connection, PublicKey } from '@solana/web3.js';
-import { Program, Provider, web3 } from '@project-serum/anchor';
-import CountdownTimer from '../CountdownTimer';
-import { MintLayout, TOKEN_PROGRAM_ID, Token } from '@solana/spl-token';
-import { programs } from '@metaplex/js';
-import './CandyMachine.css';
+import React, { useEffect, useState } from "react";
+import { Connection, PublicKey } from "@solana/web3.js";
+import { Program, Provider, web3 } from "@project-serum/anchor";
+import CountdownTimer from "../CountdownTimer";
+import { MintLayout, TOKEN_PROGRAM_ID, Token } from "@solana/spl-token";
+import { programs } from "@metaplex/js";
+import "./CandyMachine.css";
 import {
   candyMachineProgram,
   TOKEN_METADATA_PROGRAM_ID,
   SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
-} from './helpers';
+} from "./helpers";
 const {
   metadata: { Metadata, MetadataProgram },
 } = programs;
@@ -17,7 +17,7 @@ const {
 const config = new web3.PublicKey(process.env.REACT_APP_CANDY_MACHINE_CONFIG);
 const { SystemProgram } = web3;
 const opts = {
-  preflightCommitment: 'processed',
+  preflightCommitment: "processed",
 };
 
 const MAX_NAME_LENGTH = 32;
@@ -26,12 +26,11 @@ const MAX_SYMBOL_LENGTH = 10;
 const MAX_CREATOR_LEN = 32 + 1 + 1;
 
 const CandyMachine = ({ walletAddress }) => {
-
   const [machineStats, setMachineStats] = useState(null);
   // New state property
-const [mints, setMints] = useState([]);
-const [isMinting, setIsMinting] = useState(false);
-const [isLoadingMints, setIsLoadingMints] = useState(false);
+  const [mints, setMints] = useState([]);
+  const [isMinting, setIsMinting] = useState(false);
+  const [isLoadingMints, setIsLoadingMints] = useState(false);
   // Actions
   const fetchHashTable = async (hash, metadataEnabled) => {
     const connection = new web3.Connection(
@@ -82,7 +81,7 @@ const [isLoadingMints, setIsLoadingMints] = useState(false);
     return (
       await PublicKey.findProgramAddress(
         [
-          Buffer.from('metadata'),
+          Buffer.from("metadata"),
           TOKEN_METADATA_PROGRAM_ID.toBuffer(),
           mint.toBuffer(),
         ],
@@ -95,10 +94,10 @@ const [isLoadingMints, setIsLoadingMints] = useState(false);
     return (
       await PublicKey.findProgramAddress(
         [
-          Buffer.from('metadata'),
+          Buffer.from("metadata"),
           TOKEN_METADATA_PROGRAM_ID.toBuffer(),
           mint.toBuffer(),
-          Buffer.from('edition'),
+          Buffer.from("edition"),
         ],
         TOKEN_METADATA_PROGRAM_ID
       )
@@ -116,7 +115,7 @@ const [isLoadingMints, setIsLoadingMints] = useState(false);
 
   const mintToken = async () => {
     try {
-      setIsMinting(true)
+      setIsMinting(true);
       const mint = web3.Keypair.generate();
       const token = await getTokenWallet(
         walletAddress.publicKey,
@@ -189,34 +188,34 @@ const [isLoadingMints, setIsLoadingMints] = useState(false);
         instructions,
       });
 
-      console.log('txn:', txn);
+      console.log("txn:", txn);
 
       // Setup listener
       connection.onSignatureWithOptions(
         txn,
         async (notification, context) => {
-          if (notification.type === 'status') {
-            console.log('Receievd status event');
+          if (notification.type === "status") {
+            console.log("Receievd status event");
 
             const { result } = notification;
             if (!result.err) {
-              console.log('NFT Minted!');
+              console.log("NFT Minted!");
               setIsMinting(false);
-              await getCandyMachineState()
+              await getCandyMachineState();
             }
           }
         },
-        { commitment: 'processed' }
+        { commitment: "processed" }
       );
     } catch (error) {
-      let message = error.msg || 'Minting failed! Please try again!';
+      let message = error.msg || "Minting failed! Please try again!";
       setIsMinting(false);
 
       if (!error.msg) {
-        if (error.message.indexOf('0x138')) {
-        } else if (error.message.indexOf('0x137')) {
+        if (error.message.indexOf("0x138")) {
+        } else if (error.message.indexOf("0x137")) {
           message = `SOLD OUT!`;
-        } else if (error.message.indexOf('0x135')) {
+        } else if (error.message.indexOf("0x135")) {
           message = `Insufficient funds to mint. Please fund your wallet.`;
         }
       } else {
@@ -260,110 +259,131 @@ const [isLoadingMints, setIsLoadingMints] = useState(false);
       data: Buffer.from([]),
     });
   };
- 
 
   const getProvider = () => {
-
     const rpcHost = process.env.REACT_APP_SOLANA_RPC_HOST;
     //new connection object
     const connection = new Connection(rpcHost);
 
     //new solana provider object
 
-    const provider = new Provider(connection, window.solana, opts.preflightCommitment);
-    return provider;
-  }
-//  getCandyMachineState as an async method
-const getCandyMachineState = async () => { 
-  const provider = getProvider();
-  const idl = await Program.fetchIdl(candyMachineProgram, provider);
-  const program = new Program(idl, candyMachineProgram, provider);
-  const candyMachine = await program.account.candyMachine.fetch(
-    process.env.REACT_APP_CANDY_MACHINE_ID
+    const provider = new Provider(
+      connection,
+      window.solana,
+      opts.preflightCommitment
     );
-    
+    return provider;
+  };
+  //  getCandyMachineState as an async method
+  const getCandyMachineState = async () => {
+    const provider = getProvider();
+    const idl = await Program.fetchIdl(candyMachineProgram, provider);
+    const program = new Program(idl, candyMachineProgram, provider);
+    const candyMachine = await program.account.candyMachine.fetch(
+      process.env.REACT_APP_CANDY_MACHINE_ID
+    );
+
     const itemsAvailable = candyMachine.data.itemsAvailable.toNumber();
     const itemsRedeemed = candyMachine.itemsRedeemed.toNumber();
     const itemsRemaining = itemsAvailable - itemsRedeemed;
     const goLiveData = candyMachine.data.goLiveDate.toNumber();
-    
-    const goLiveDateTimeString = `${new Date(
-      goLiveData * 1000
-      ).toGMTString()}`
-      
-      // Add this data to your state to render
-      setMachineStats({
-        itemsAvailable,
-        itemsRedeemed,
-        itemsRemaining,
-        goLiveData,
-        goLiveDateTimeString,
-      });
-      
-  console.log({
-    itemsAvailable,
-    itemsRedeemed,
-    itemsRemaining,
-    goLiveData,
-    goLiveDateTimeString,
-  });
 
-  setIsLoadingMints(true)
-  const data = await fetchHashTable(
-    process.env.REACT_APP_CANDY_MACHINE_ID,
-    true
-  );
-  
-  if (data.length !== 0) {
-    for (const mint of data) {
-      // Get URI
-      const response = await fetch(mint.data.uri);
-      const parse = await response.json();
-      const name = await fetch(mint)
-      console.log("this is name", name)
-      console.log("Past Minted NFT", mint)
-  
-      // Get image URI
-      if (!mints.find((mint) => mint === parse.image)) {
-        setMints((prevState) => [...prevState, parse.image]);
+    const goLiveDateTimeString = `${new Date(goLiveData * 1000).toGMTString()}`;
+
+    // Add this data to your state to render
+    setMachineStats({
+      itemsAvailable,
+      itemsRedeemed,
+      itemsRemaining,
+      goLiveData,
+      goLiveDateTimeString,
+    });
+
+    console.log({
+      itemsAvailable,
+      itemsRedeemed,
+      itemsRemaining,
+      goLiveData,
+      goLiveDateTimeString,
+    });
+
+    setIsLoadingMints(true);
+    const data = await fetchHashTable(
+      process.env.REACT_APP_CANDY_MACHINE_ID,
+      true
+    );
+
+    if (data.length !== 0) {
+      for (const mint of data) {
+        // Get URI
+        const response = await fetch(mint.data.uri);
+        const parse = await response.json();
+        const name = await fetch(mint);
+        console.log("this is name", name);
+        console.log("Past Minted NFT", mint);
+
+        // Get image URI
+        if (!mints.find((mint) => mint === parse.image)) {
+          setMints((prevState) => [...prevState, parse.image]);
+        }
       }
     }
-  }
-  setIsLoadingMints(false);
-};
-useEffect(() => {
-  getCandyMachineState();
-},[]);
-const renderMintedItems = () => (
-  <div className="gif-container">
-    <p className="sub-text">Minted Items ✨</p>
-    <div className="gif-grid">
-      {mints.map((mint, i) => (
-        <div className="gif-item" key={i}>
-          
-          <img src={mint} alt={`Minted NFT ${mint}`} />
-          
-        </div>
-      ))}
+    setIsLoadingMints(false);
+  };
+  useEffect(() => {
+    getCandyMachineState();
+  }, []);
+  const renderMintedItems = () => (
+    <div className="gif-container">
+      <p className="sub-text">Minted Items ✨</p>
+      <div className="gif-grid">
+        {mints.map((mint, i) => (
+          <div className="gif-item" key={i}>
+            <img src={mint} alt={`Minted NFT ${mint}`} />
+          </div>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
 
-return (
-  // Only show this if machineStats is available
-  machineStats && (
-    <div className="machine-container">
+  //rendering for timer
 
-      <p>Drop Date: <br/></p><span className="drop-date">{machineStats.goLiveDateTimeString} </span>
-      <p>Items Minted:</p> <span className="items-minted">{machineStats.itemsRedeemed} / {machineStats.itemsAvailable} </span>
-      <button className="cta-button mint-button" onClick={mintToken} disabled={isMinting}>
+  // Create render function
+  const renderDropTimer = () => {
+    const currentDate = new Date();
+    const dropDate = new Date(machineStats.goLiveData * 1000);
+
+    if (currentDate < dropDate) {
+      console.log("Before drop date!");
+      // Don't forget to pass over your dropDate!
+      return <CountdownTimer dropDate={dropDate} />;
+    }
+
+    // Else let's just return the current drop date
+    return <p>{`Drop Date: ${machineStats.goLiveDateTimeString}`}</p>;
+  };
+  return (
+    // Only show this if machineStats is available
+    machineStats && (
+      <div className="machine-container">
+        {/* Add this at the beginning of our component */}
+        <div className="drop-timer">{renderDropTimer()}</div>
+        <p>Items Minted:</p>{" "}
+        <span className="items-minted">
+          {machineStats.itemsRedeemed} / {machineStats.itemsAvailable}{" "}
+        </span>
+        <button
+          className="cta-button mint-button"
+          onClick={mintToken}
+          disabled={isMinting}
+        >
           Mint LFC NFT
-      </button>
-      {isLoadingMints && <p className="loading-mints">LOADING MINTS...</p>}
+        </button>
+        {isLoadingMints && <p className="loading-mints">LOADING MINTS...</p>}
         {mints.length > 0 && renderMintedItems()}
-    </div>
-  )
-);
+      </div>
+    )
+  );
 };
 
 export default CandyMachine;
