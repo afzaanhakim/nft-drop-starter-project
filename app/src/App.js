@@ -72,7 +72,7 @@ const App = () => {
     <div className="App">
       <div className="container">
         <div className="header-container">
-          <p className="header">LFC DROP!</p>
+          <p className="header">⚽ ⚽ LFC DROP! ⚽ ⚽</p>
           <p className="sub-text">LFC NFT drop machine with fair mint</p>
           {/* showing button when wallet isnt connected*/}
           {!walletAddress && renderNotConnectedContainer()}  {walletAddress && <CandyMachine walletAddress={window.solana} />}

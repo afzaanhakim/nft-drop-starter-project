@@ -37,7 +37,7 @@ export default function CountdownTimer({ dropDate }) {
 
   return (
     <div className="timer-container">
-      <p className="timer-header">Candy Drop Starting In</p>
+      <p className="timer-header">New Drop Starting In</p>
       {timerString && <div className="timer-value">{`⏰ ${timerString}`}</div>}
     </div>
   );
